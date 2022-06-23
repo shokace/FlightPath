@@ -1,6 +1,8 @@
+import sys
+
 import requests
 import json
-
+from PIL import Image, ImageDraw
 
 r = requests.get('http://api.open-notify.org/iss-now.json')
 
@@ -21,4 +23,11 @@ for data in rawData['iss_position']['latitude']:
 print("longitude: " + longitude)
 print("latitude: " + latitude)
 
-#test
+with Image.open("../FlightPath/map.jpg") as im:
+
+    draw = ImageDraw.Draw(im)
+    draw.line((0, 0) + im.size, fill=128)
+    draw.line((0, im.size[1], im.size[0], 0), fill=128)
+
+    # write to stdout
+    im.save(sys.stdout, "PNG") #making initial cross on map.jpg.. testing PIL
