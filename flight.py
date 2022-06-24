@@ -2,6 +2,8 @@ import sys
 
 import requests
 import json
+import math
+import numpy as np
 from PIL import Image, ImageDraw
 
 ###COORDINATES###
@@ -10,6 +12,8 @@ topleft_long = 180
 botright_lat = -90
 botright_long = 0
 
+###MATH###
+rad_earth = 6371 #radius earth km
 
 r = requests.get('http://api.open-notify.org/iss-now.json')
 
@@ -22,6 +26,7 @@ else:
 longitude = ""
 latitude = ""
 
+
 rawData = json.loads(r.text)
 for data in rawData['iss_position']['longitude']:
     longitude += data
@@ -32,19 +37,40 @@ print("longitude: " + longitude)
 print("latitude: " + latitude)
 
 
+##BACKGROUND IMAGE INITIALIZATION##
+
+bg = Image.open("map.png")
+image_width, image_height = bg.size
+
+def get_cartesian(lat=None,lon=None):
+    lat, lon = np.deg2rad(lat), np.deg2rad(lon)
+    x = rad_earth * np.cos(lat) * np.cos(lon)
+    y = rad_earth * np.cos(lat) * np.sin(lon)
+    return x,y
+
+
+xy = get_cartesian(float(latitude),float(longitude))
+
+print(xy)
+x = int(((xy[0])+6371)/(rad_earth/image_width))
+y = int(((xy[1])+6371)/(rad_earth/image_height))
+print(x,y)
+
+
+##ISS ICON INITIALIZATION## 3444228.8365710177
+
+icon = Image.open("iss.png")
+bg.paste(icon, (x,y), mask = icon.im)
 
 
 
-with Image.open("map.png") as im:
-
-    image_width, image_height = im.size # this is where things get interesting
-
-    #offsetting x,y grid to fit long + lat coordinates from iss position to fit image
-    #x_offset = (float(longitude) - topleft_long) / (botright_long - topleft_long) * image_width #too bad this doesnt work yet
-    #x_offset = (float(latitude) - topleft_lat) / (botright_lat - topleft_lat) * image_height
 
 
-    draw = ImageDraw.Draw(im)
-    draw.point((1000,100) + im.size, fill="red")
-    im.save("map_point.png") #making initial cross on map.jpg.. testing PIL
-    im.show()
+
+bg.show()
+
+
+
+
+
+
