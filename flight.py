@@ -1,16 +1,7 @@
-import sys
 
 import requests
 import json
-import math
-import numpy as np
 from PIL import Image, ImageDraw
-
-###COORDINATES###
-topleft_lat = 90
-topleft_long = 180
-botright_lat = -90
-botright_long = 0
 
 ###MATH###
 rad_earth = 6371 #radius earth km
@@ -42,6 +33,14 @@ print("latitude: " + latitude)
 bg = Image.open("map.png")
 image_width, image_height = bg.size
 
+
+
+x = int((image_width/360) * (180 + float(longitude)))
+y = int((image_height/180) * (90 - float(latitude)))
+
+"""
+
+
 def get_cartesian(lat=None,lon=None):
     lat, lon = np.deg2rad(lat), np.deg2rad(lon)
     x = rad_earth * np.cos(lat) * np.cos(lon)
@@ -55,6 +54,8 @@ print(xy)
 x = int(((xy[0])+6371)/(rad_earth/image_width))
 y = int(((xy[1])+6371)/(rad_earth/image_height))
 print(x,y)
+
+"""
 
 
 ##ISS ICON INITIALIZATION## 3444228.8365710177
